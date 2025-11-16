@@ -35,10 +35,9 @@ fig = px.line(
 fig.add_vline(
     x=pd.Timestamp("2021-01-15"),
     line_width=2,
-    line_dash="dash",
-    annotation_text="Price Increase (15 Jan 2021)",
-    annotation_position="top left"
+    line_dash="dash"
 )
+
 
 # ---------------------------------------------------
 # Dash App Layout
