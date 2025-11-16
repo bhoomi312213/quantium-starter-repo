@@ -7,7 +7,10 @@ from dash import Dash, dcc, html
 # ---------------------------------------------------
 df = pd.read_csv("data/combined_output.csv", parse_dates=["date"])
 
-# Sort by date (required)
+# Create a sales column (price × quantity)
+df["sales"] = df["price"] * df["quantity"]
+
+# Sort by date
 df = df.sort_values("date")
 
 # ---------------------------------------------------
@@ -57,4 +60,5 @@ app.layout = html.Div([
 # ---------------------------------------------------
 if __name__ == "__main__":
     app.run_server(debug=True)
+
 
