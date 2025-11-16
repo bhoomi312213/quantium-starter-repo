@@ -3,21 +3,12 @@ import plotly.express as px
 from dash import Dash, dcc, html
 
 # ---------------------------------------------------
-# Load cleaned combined sales dataset
+# Load combined dataset
 # ---------------------------------------------------
-
 df = pd.read_csv("data/combined_output.csv", parse_dates=["date"])
 
-# Ensure numeric types (some CSV values may be stored as strings)
-numeric_cols = ["price", "quantity"]
-for col in numeric_cols:
-    df[col] = pd.to_numeric(df[col], errors="coerce")
-
-# Create sales column
+# Create a sales column (price * quantity)
 df["sales"] = df["price"] * df["quantity"]
-
-# Remove any bad rows
-df = df.dropna(subset=["sales"])
 
 # Sort by date
 df = df.sort_values("date")
@@ -25,7 +16,6 @@ df = df.sort_values("date")
 # ---------------------------------------------------
 # Create line chart
 # ---------------------------------------------------
-
 fig = px.line(
     df,
     x="date",
@@ -34,7 +24,7 @@ fig = px.line(
     labels={"date": "Date", "sales": "Sales ($)"}
 )
 
-# Vertical line showing Pink Morsel price change
+# Add vertical line for price change on Jan 15 2021
 fig.add_vline(
     x="2021-01-15",
     line_width=2,
@@ -44,9 +34,8 @@ fig.add_vline(
 )
 
 # ---------------------------------------------------
-# Dash App Setup
+# Dash App
 # ---------------------------------------------------
-
 app = Dash(__name__)
 app.title = "Soul Foods Sales Visualiser"
 
@@ -68,8 +57,7 @@ app.layout = html.Div([
 ])
 
 # ---------------------------------------------------
-# Run App
+# Run the App
 # ---------------------------------------------------
-
 if __name__ == "__main__":
     app.run_server(debug=True)
