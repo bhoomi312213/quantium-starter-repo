@@ -3,12 +3,19 @@ import plotly.express as px
 from dash import Dash, dcc, html
 
 # ---------------------------------------------------
-# Load combined dataset
+# Load data
 # ---------------------------------------------------
 df = pd.read_csv("data/combined_output.csv", parse_dates=["date"])
 
-# Create a sales column (price * quantity)
+# Convert numeric fields safely
+df["price"] = pd.to_numeric(df["price"], errors="coerce")
+df["quantity"] = pd.to_numeric(df["quantity"], errors="coerce")
+
+# Create sales column
 df["sales"] = df["price"] * df["quantity"]
+
+# Drop any rows where sales failed
+df = df.dropna(subset=["sales"])
 
 # Sort by date
 df = df.sort_values("date")
@@ -24,9 +31,9 @@ fig = px.line(
     labels={"date": "Date", "sales": "Sales ($)"}
 )
 
-# Add vertical line for price change on Jan 15 2021
+# Add vertical line
 fig.add_vline(
-    x="2021-01-15",
+    x=pd.Timestamp("2021-01-15"),
     line_width=2,
     line_dash="dash",
     annotation_text="Price Increase (15 Jan 2021)",
@@ -34,7 +41,7 @@ fig.add_vline(
 )
 
 # ---------------------------------------------------
-# Dash App
+# Dash App Layout
 # ---------------------------------------------------
 app = Dash(__name__)
 app.title = "Soul Foods Sales Visualiser"
@@ -45,19 +52,12 @@ app.layout = html.Div([
         style={"textAlign": "center"}
     ),
 
-    html.P(
-        "Sales before and after the Pink Morsel price increase (15 Jan 2021)",
-        style={"textAlign": "center"}
-    ),
-
-    dcc.Graph(
-        id="sales_chart",
-        figure=fig
-    )
+    dcc.Graph(id="sales_chart", figure=fig)
 ])
 
 # ---------------------------------------------------
-# Run the App
+# Run the server
 # ---------------------------------------------------
 if __name__ == "__main__":
     app.run_server(debug=True)
+
