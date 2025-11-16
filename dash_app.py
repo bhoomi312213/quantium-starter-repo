@@ -3,23 +3,29 @@ import plotly.express as px
 from dash import Dash, dcc, html
 
 # ---------------------------------------------------
-# Load cleaned combined sales dataset (Task 1 output)
+# Load cleaned combined sales dataset
 # ---------------------------------------------------
+
 df = pd.read_csv("data/combined_output.csv", parse_dates=["date"])
 
-# Ensure numeric columns (IMPORTANT FIX)
-df["price"] = pd.to_numeric(df["price"], errors="coerce")
-df["quantity"] = pd.to_numeric(df["quantity"], errors="coerce")
+# Ensure numeric types (some CSV values may be stored as strings)
+numeric_cols = ["price", "quantity"]
+for col in numeric_cols:
+    df[col] = pd.to_numeric(df[col], errors="coerce")
 
-# Create sales column (price × quantity)
+# Create sales column
 df["sales"] = df["price"] * df["quantity"]
 
-# Sort by date (required)
+# Remove any bad rows
+df = df.dropna(subset=["sales"])
+
+# Sort by date
 df = df.sort_values("date")
 
 # ---------------------------------------------------
 # Create line chart
 # ---------------------------------------------------
+
 fig = px.line(
     df,
     x="date",
@@ -28,17 +34,19 @@ fig = px.line(
     labels={"date": "Date", "sales": "Sales ($)"}
 )
 
-# Vertical line for Pink Morsel price change
+# Vertical line showing Pink Morsel price change
 fig.add_vline(
     x="2021-01-15",
     line_width=2,
     line_dash="dash",
-    annotation_text="Price Increase (15 Jan 2021)"
+    annotation_text="Price Increase (15 Jan 2021)",
+    annotation_position="top left"
 )
 
 # ---------------------------------------------------
-# Dash App Layout
+# Dash App Setup
 # ---------------------------------------------------
+
 app = Dash(__name__)
 app.title = "Soul Foods Sales Visualiser"
 
@@ -60,8 +68,8 @@ app.layout = html.Div([
 ])
 
 # ---------------------------------------------------
-# Run the server
+# Run App
 # ---------------------------------------------------
+
 if __name__ == "__main__":
     app.run_server(debug=True)
-
