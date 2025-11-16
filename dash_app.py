@@ -163,5 +163,6 @@ else:
 
 if __name__ == "__main__":
     print("\nStarting Dash server at http://127.0.0.1:8050/ ...\n")
-    app.run_server(debug=True)
+    app.run(debug=True)
+
 
