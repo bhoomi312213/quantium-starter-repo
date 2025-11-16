@@ -38,6 +38,14 @@ fig.add_vline(
     line_dash="dash"
 )
 
+fig.add_annotation(
+    x=pd.Timestamp("2021-01-15"),
+    y=daily_sales["sales"].max(),
+    text="Price Increase (15 Jan 2021)",
+    showarrow=True,
+    arrowhead=1
+)
+
 
 # ---------------------------------------------------
 # Dash App Layout
