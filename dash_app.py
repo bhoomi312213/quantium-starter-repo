@@ -3,14 +3,18 @@ import plotly.express as px
 from dash import Dash, dcc, html
 
 # ---------------------------------------------------
-# Load cleaned combined sales dataset (from Task 1)
+# Load cleaned combined sales dataset (Task 1 output)
 # ---------------------------------------------------
 df = pd.read_csv("data/combined_output.csv", parse_dates=["date"])
 
-# Create a sales column (price × quantity)
+# Ensure numeric columns (IMPORTANT FIX)
+df["price"] = pd.to_numeric(df["price"], errors="coerce")
+df["quantity"] = pd.to_numeric(df["quantity"], errors="coerce")
+
+# Create sales column (price × quantity)
 df["sales"] = df["price"] * df["quantity"]
 
-# Sort by date
+# Sort by date (required)
 df = df.sort_values("date")
 
 # ---------------------------------------------------
@@ -60,5 +64,4 @@ app.layout = html.Div([
 # ---------------------------------------------------
 if __name__ == "__main__":
     app.run_server(debug=True)
-
 
